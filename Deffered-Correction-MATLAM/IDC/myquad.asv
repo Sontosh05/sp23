@@ -1,0 +1,31 @@
+function[sol]=myquad(f, a, b, n)
+
+% Three-Point Guassian_Legendre Polynomial integration.
+h=(b-a)/n;
+x1=a+[0:n]*h;
+
+np=3;
+
+[x, w]=gausslegendre(np);
+
+sol=0;
+dx=h/2; % (b-a)/2
+t=zeros(np,1);
+ds=0;
+for k=1:n
+
+    avg=(x1(k)+x1(k+1))/2; % (a+b)/2
+    for j=1:np
+      t(j)=dx*x(j)+avg;
+%     t1=dx*x(1)+avg;
+%     t2=dx*x(2)+avg;
+%     t3=dx*x(3)+avg;
+      dy=dx*w(j)*f(t(j));
+      ds
+    end
+    %dy=dx*(w(1)*f(t1)+w(2)*f(t2)+w(3)*f(t3));
+
+    sol=sol+dy;
+end
+
+end

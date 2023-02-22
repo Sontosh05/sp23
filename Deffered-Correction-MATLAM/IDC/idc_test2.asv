@@ -1,0 +1,35 @@
+clear all
+close all
+
+for i=1:5
+    N(i)=10*2^(i-1);
+end
+% Convergence Study
+for p=1:5
+    a=0;b=0.5;
+    n=N(p);
+    h=(b-a)/n;
+    y0=1;
+    E0=0;
+    itr=4; % Number of correction
+    f=@(y, t) y.^2;
+    [t, yp, y1,y2, y3, y4] = myidc(f, a, b, h, y0, E0, n, itr);
+    exact=1./(1-t);
+    %Storing the errors
+     errp(p)=norm(exact(n+1)-yp(n+1));
+     err1(p)=norm(exact(n+1)-y1(n+1));
+     err2(p)=norm(exact(n+1)-y2(n+1));
+     err3(p)=norm(exact(n+1)-y3(n+1));
+     err4(p)=norm(exact(n+1)-y4(n+1));
+end
+clf
+loglog(N, errp, '-ko', 'MarkerSize',12);
+hold on
+loglog(N, err1, '-ro', 'MarkerSize',12);
+loglog(N, err2, '-bo', 'MarkerSize',12);
+loglog(N, err3, '-sm', 'MarkerSize',12);
+loglog(N, err4, '-sg', 'MarkerSize',12);
+legend('Provisional', '1st correction', '2nd correction', '3rd correction','4th corrrection')
+%lo
+p=polyfit(log(N'),log(err2),1);
+slope = p(1)

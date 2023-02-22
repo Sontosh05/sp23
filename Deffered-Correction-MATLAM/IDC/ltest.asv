@@ -1,0 +1,11 @@
+clear all
+close all
+n=5;
+t=linspace(0,1,n);
+nfval=@(t) sin(pi*t);
+f=nfval(t); a=1/4;b=1/2;
+[apprx,~]=Lpoly(t, f, a,b);
+
+true=
+
+

@@ -1,0 +1,112 @@
+clear all
+close all
+
+for i=1:5
+    N(i)=10*2^(i-1);
+end
+
+for p=1:5
+    a=0;b=0.5;
+    n=N(p);
+    h=(b-a)/n;
+    y0=1;
+    f=@(y, t) y.^2;
+    [t, y]=forwardE(f, a, b, y0, n); % Provisional Solution
+    % intf=-log(cos(y/2))+log(sin(y/2));
+    %exact=acos(-t+1);
+    exact=1./(1-t);
+    y1=y;
+    %Construct the error function
+    Erf=@(y, E) f(y+E) - f(y);   % f(y+e)-f(y)
+    
+    y2=y1;
+    nfval=f(y2); % New function value
+    ynew2(1)=1;
+    E(1)=0;
+    % First Correction
+    for r=2:n+1
+       
+        E(r)=E(r-1)-(y2(r)-y2(r-1)) + h*Erf(y2(r-1), E(r-1))+...
+            Lpoly(t(r-1:r),nfval(r-1:r),t(r-1),t(r));
+
+        ynew2(r)=y2(r)+E(r);
+    end
+    err1(p)=norm(exact(n+1)-y1(n+1));
+    err2(p)=norm(exact(n+1)-ynew2(n+1));
+
+    % second Correction
+    y2=ynew2;
+    nfval=f(y2); % New function value
+    ynew2(1)=1;
+    E(1)=0;
+    
+    r=2;
+    E(r)=E(r-1)-(y2(r)-y2(r-1)) + h*Erf(y2(r-1), E(r-1))+...
+        Lpoly(t(r-1:r+1),nfval(r-1:r+1),t(r-1),t(r));
+
+    ynew2(r)=y2(r)+E(r);
+    for r=3:n+1
+
+        E(r)=E(r-1)-(y2(r)-y2(r-1)) + h*Erf(y2(r-1), E(r-1))+...
+            Lpoly(t(r-2:r),nfval(r-2:r),t(r-1),t(r));
+
+        ynew2(r)=y2(r)+E(r);
+    end
+
+    err3(p)=norm(exact(n+1)-ynew2(n+1));
+
+    % 3rd Correction
+    y2=ynew2;
+    nfval=f(y2); % New function value
+    ynew2(1)=1;
+    E(1)=0;
+
+    for r=2:3
+        E(r)=E(r-1)-(y2(r)-y2(r-1)) + h*Erf(y2(r-1), E(r-1))+...
+        Lpoly(t(1:4),nfval(1:4),t(r-1),t(r));
+
+        ynew2(r)=y2(r)+E(r);
+    end
+    for r=4:n+1
+
+        E(r)=E(r-1)-(y2(r)-y2(r-1)) + h*Erf(y2(r-1), E(r-1))+...
+            Lpoly(t(r-3:r),nfval(r-3:r),t(r-1),t(r));
+
+        ynew2(r)=y2(r)+E(r);
+    end
+
+    err4(p)=norm(exact(n+1)-ynew2(n+1));
+
+    % 4th Correction
+    y2=ynew2;
+    nfval=f(y2); % New function value
+    ynew2(1)=1;
+    E(1)=0;
+
+    for r=2:4
+        E(r)=E(r-1)-(y2(r)-y2(r-1)) + h*Erf(y2(r-1), E(r-1))+...
+        Lpoly(t(1:5),nfval(1:5),t(r-1),t(r));
+
+        ynew2(r)=y2(r)+E(r);
+    end
+
+    for r=5:n+1
+
+        E(r)=E(r-1)-(y2(r)-y2(r-1)) + h*Erf(y2(r-1), E(r-1))+...
+            Lpoly(t(r-4:r),nfval(r-4:r),t(r-1),t(r));
+
+        ynew2(r)=y2(r)+E(r);
+    end
+
+    err5(p)=norm(exact(n+1)-ynew2(n+1));
+
+end
+clf
+loglog(N, err1, '-ko', 'MarkerSize',12);
+hold on
+loglog(N, err2, '-ro', 'MarkerSize',12);
+loglog(N, err3, '-bo', 'MarkerSize',12);
+loglog(N, err4, '-sg', 'MarkerSize',12);
+loglog(N, err5, '-sm', 'MarkerSize',12);
+p=polyfit(log(N(1:4)'),log(err5(1:4)),1);
+slope = p(1)
